@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Our Sweet Escape</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;700&family=Playfair+Display:wght@500;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- SECTION 1 -->
+<section class="panel hero">
+
+<img src="images/welcome.png" class="welcome-img">
+
+<div class="timer-box">
+
+<h2 id="anniversaryDate">December 28 2025</h2>
+
+<div class="until-line">— until —</div>
+
+<div id="fullDate"></div>
+
+<div id="wibClock"></div>
+
+<div class="count-grid">
+<div><span id="days">0</span><small>Days</small></div>
+<div><span id="hours">0</span><small>Hours</small></div>
+<div><span id="minutes">0</span><small>Minutes</small></div>
+<div><span id="seconds">0</span><small>Seconds</small></div>
+</div>
+
+<p>AND STILL COUNTING</p>
+
+</div>
+</section>
+
+<!-- SECTION 2 -->
+<section class="panel memories">
+
+<img src="images/sakurakiri.png" class="sakura left">
+<img src="images/sakurakanan.png" class="sakura right">
+
+<div class="media-stack">
+
+<div class="media-box">
+<img src="images/fotolandscape.jpg" alt="">
+</div>
+
+<div class="media-box">
+<video autoplay muted loop playsinline>
+<source src="video/cliplandscape.mp4" type="video/mp4">
+</video>
+</div>
+
+</div>
+
+</section>
+
+<!-- SECTION 3 -->
+<section class="panel quotes-section">
+
+<button id="generateBtn">Generate Quotes</button>
+
+<div id="quoteOutput"></div>
+
+</section>
+
+<script src="quotes.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
