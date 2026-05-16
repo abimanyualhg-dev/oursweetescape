@@ -2,7 +2,7 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
-cursor:url("lovecursor.png"),auto;
+cursor: url('lovecursor.png') 16 16, auto;
 }
 
 body{
