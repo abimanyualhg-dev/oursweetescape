@@ -56,7 +56,7 @@ ringtone.loop = true;
 const connectedSound =
 new Audio("connected.mp3");
 
-/* unlock audio browser */
+/* unlock audio */
 document.body.addEventListener("click", async () => {
 
 try {
@@ -76,7 +76,7 @@ console.log(e);
 }, { once:true });
 
 /* =========================
-   WEBRTC CORE
+   WEBRTC
 ========================= */
 
 let localStream;
@@ -84,15 +84,16 @@ let peerConnection;
 
 let hasCreatedOffer = false;
 let hasSetRemote = false;
+let connectedPlayed = false;
 
 const servers = {
 iceServers: [
-{ urls: "stun:stun.l.google.com:19302" }
+{ urls:"stun:stun.l.google.com:19302" }
 ]
 };
 
 /* =========================
-   GET MEDIA
+   GET MIC
 ========================= */
 
 async function initMedia() {
@@ -164,10 +165,40 @@ peerConnection.connectionState
 }
 
 /* =========================
+   SHOW CONNECTED UI
+========================= */
+
+async function showConnectedUI() {
+
+if (connectedPlayed) return;
+
+connectedPlayed = true;
+
+ringtone.pause();
+ringtone.currentTime = 0;
+
+connectedSound.currentTime = 0;
+
+connectedSound.play().catch(()=>{});
+
+callText.textContent =
+"CONNECTED";
+
+callImage.src =
+"imageoncall.jpg";
+
+incomingButtons.style.display =
+"none";
+
+}
+
+/* =========================
    START CALL
 ========================= */
 
 startBtn.onclick = async () => {
+
+connectedPlayed = false;
 
 hasCreatedOffer = false;
 hasSetRemote = false;
@@ -186,7 +217,7 @@ await initMedia();
 
 createPeer();
 
-/* UI CALLER */
+/* UI */
 
 popup.classList.add("show");
 
@@ -211,7 +242,7 @@ callImage.src =
 
 }
 
-/* PLAY RINGTONE */
+/* ringtone */
 
 try {
 
@@ -223,14 +254,15 @@ await ringtone.play();
 console.log(e);
 }
 
-/* CLEAR OLD */
+/* reset old */
 
 await setDoc(roomRef,{
 answer:null,
+accepted:false,
 candidates:[]
 },{ merge:true });
 
-/* CREATE OFFER */
+/* offer */
 
 const offer =
 await peerConnection.createOffer();
@@ -241,43 +273,37 @@ offer
 
 hasCreatedOffer = true;
 
-/* SEND */
+/* send */
 
 await setDoc(roomRef,{
 calling:true,
 caller:currentUser,
 offer:JSON.stringify(offer),
+accepted:false,
 candidates:[]
 });
 
 };
 
 /* =========================
-   ACCEPT BUTTON
+   ACCEPT
 ========================= */
 
 async function fakeAccept() {
 
-ringtone.pause();
+/* local UI */
 
-ringtone.currentTime = 0;
+await showConnectedUI();
 
-connectedSound.currentTime = 0;
+/* broadcast */
 
-connectedSound.play().catch(()=>{});
-
-callText.textContent =
-"CONNECTED";
-
-callImage.src =
-"imageoncall.jpg";
-
-incomingButtons.style.display =
-"none";
+await setDoc(roomRef,{
+accepted:true
+},{ merge:true });
 
 }
 
-/* ACCEPT */
+/* accept */
 
 acceptBtn.onclick = async () => {
 
@@ -285,7 +311,7 @@ await fakeAccept();
 
 };
 
-/* DON'T REJECT */
+/* don't reject */
 
 rejectBtn.onclick = async () => {
 
@@ -304,6 +330,7 @@ calling:false,
 caller:null,
 offer:null,
 answer:null,
+accepted:false,
 candidates:[]
 });
 
@@ -329,11 +356,12 @@ localStream = null;
 
 hasCreatedOffer = false;
 hasSetRemote = false;
+connectedPlayed = false;
 
 };
 
 /* =========================
-   REALTIME LISTENER
+   REALTIME
 ========================= */
 
 onSnapshot(roomRef, async (docSnap) => {
@@ -342,7 +370,9 @@ if (!docSnap.exists()) return;
 
 const data = docSnap.data();
 
-/* CALL ENDED */
+/* =========================
+   CALL ENDED
+========================= */
 
 if (!data.calling) {
 
@@ -356,13 +386,20 @@ return;
 }
 
 /* =========================
-   RECEIVER FLOW
+   BOTH CONNECTED UI
 ========================= */
 
-/* caller jangan render incoming */
-if (data.caller === currentUser) {
+if (data.accepted) {
 
-/* caller dapet answer */
+await showConnectedUI();
+
+}
+
+/* =========================
+   CALLER FLOW
+========================= */
+
+if (data.caller === currentUser) {
 
 if (
 data.answer &&
@@ -384,7 +421,9 @@ return;
 
 }
 
-/* RECEIVER */
+/* =========================
+   RECEIVER FLOW
+========================= */
 
 popup.classList.add("show");
 
@@ -409,25 +448,29 @@ callImage.src =
 
 }
 
-/* PLAY RINGTONE */
+/* ringtone */
 
 try {
+
+if (!data.accepted) {
 
 ringtone.currentTime = 0;
 
 await ringtone.play();
 
+}
+
 } catch(e) {
 console.log(e);
 }
 
-/* WEBRTC */
+/* webrtc */
 
 await initMedia();
 
 createPeer();
 
-/* HANDLE OFFER */
+/* offer */
 
 if (
 data.offer &&
@@ -453,7 +496,7 @@ answer:JSON.stringify(answer)
 
 }
 
-/* ICE */
+/* ice */
 
 if (
 data.candidates &&
