@@ -3,7 +3,8 @@ import { db } from "./firebase.js";
 import {
 doc,
 setDoc,
-onSnapshot
+onSnapshot,
+arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const currentUser =
@@ -25,11 +26,14 @@ const remoteAudio =
 document.getElementById("remoteAudio");
 
 /* =========================
-   WEBRTC CORE SETUP
+   WEBRTC CORE
 ========================= */
 
 let localStream;
 let peerConnection;
+
+let hasCreatedOffer = false;
+let hasSetRemote = false;
 
 const servers = {
   iceServers: [
@@ -39,6 +43,8 @@ const servers = {
 
 /* GET MIC */
 async function initMedia() {
+  if (localStream) return;
+
   localStream = await navigator.mediaDevices.getUserMedia({
     audio: true,
     video: false
@@ -47,26 +53,30 @@ async function initMedia() {
 
 /* CREATE PEER */
 function createPeer() {
+
+  if (peerConnection) return;
+
   peerConnection = new RTCPeerConnection(servers);
 
-  // kirim audio kita
   localStream.getTracks().forEach(track => {
     peerConnection.addTrack(track, localStream);
   });
 
-  // terima audio lawan
   peerConnection.ontrack = (event) => {
     remoteAudio.srcObject = event.streams[0];
+    remoteAudio.play().catch(()=>{});
   };
 
-  // kirim ICE candidate ke firestore
   peerConnection.onicecandidate = async (event) => {
     if (event.candidate) {
       await setDoc(roomRef, {
-        candidate: JSON.stringify(event.candidate),
-        caller: currentUser
+        candidates: arrayUnion(JSON.stringify(event.candidate))
       }, { merge: true });
     }
+  };
+
+  peerConnection.onconnectionstatechange = () => {
+    console.log("STATE:", peerConnection.connectionState);
   };
 }
 
@@ -84,10 +94,13 @@ popup.classList.add("show");
 const offer = await peerConnection.createOffer();
 await peerConnection.setLocalDescription(offer);
 
+hasCreatedOffer = true;
+
 await setDoc(roomRef, {
 calling: true,
 caller: currentUser,
-offer: JSON.stringify(offer)
+offer: JSON.stringify(offer),
+candidates: []
 });
 
 };
@@ -103,7 +116,7 @@ calling: false,
 caller: null,
 offer: null,
 answer: null,
-candidate: null
+candidates: []
 });
 
 popup.classList.remove("show");
@@ -112,6 +125,10 @@ if (peerConnection) {
 peerConnection.close();
 peerConnection = null;
 }
+
+localStream = null;
+hasCreatedOffer = false;
+hasSetRemote = false;
 
 };
 
@@ -125,19 +142,25 @@ if (!docSnap.exists()) return;
 
 const data = docSnap.data();
 
-/* OPEN POPUP IF CALL ACTIVE */
+/* =========================
+   CALL RECEIVER FLOW
+========================= */
+
 if (data.calling && data.caller !== currentUser) {
+
 popup.classList.add("show");
 
 await initMedia();
 createPeer();
 
-/* HANDLE OFFER (RECEIVER) */
-if (data.offer && !peerConnection.currentRemoteDescription) {
+/* HANDLE OFFER */
+if (data.offer && !hasSetRemote) {
 
 await peerConnection.setRemoteDescription(
 JSON.parse(data.offer)
 );
+
+hasSetRemote = true;
 
 const answer = await peerConnection.createAnswer();
 await peerConnection.setLocalDescription(answer);
@@ -146,26 +169,37 @@ await setDoc(roomRef, {
 answer: JSON.stringify(answer)
 }, { merge: true });
 }
+}
 
-/* HANDLE ANSWER (CALLER) */
-if (data.answer && peerConnection) {
+/* =========================
+   CALLER GET ANSWER
+========================= */
+
+if (data.answer && peerConnection && hasCreatedOffer) {
+
+try {
 await peerConnection.setRemoteDescription(
 JSON.parse(data.answer)
 );
+} catch(e) {}
 }
 
-/* HANDLE ICE */
-if (data.candidate && peerConnection) {
+/* =========================
+   ICE CANDIDATES (BOTH SIDES)
+========================= */
+
+if (data.candidates && peerConnection) {
+
+for (let c of data.candidates) {
 try {
 await peerConnection.addIceCandidate(
-JSON.parse(data.candidate)
+JSON.parse(c)
 );
-} catch (e) {}
+} catch(e) {}
 }
 
 }
 
-/* CLOSE CALL */
 if (!data.calling) {
 popup.classList.remove("show");
 }
