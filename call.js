@@ -26,7 +26,7 @@ const remoteAudio =
 document.getElementById("remoteAudio");
 
 /* =========================
-   NEW UI ELEMENTS
+   UI ELEMENTS
 ========================= */
 
 const callText =
@@ -44,11 +44,36 @@ document.getElementById("acceptBtn");
 const rejectBtn =
 document.getElementById("rejectBtn");
 
-const ringtone =
-document.getElementById("ringtone");
+/* =========================
+   AUDIO FILES
+========================= */
+
+/* 🔥 LANGSUNG PANGGIL FILE */
+const ringtone = new Audio("./ringing.mp3");
+
+ringtone.loop = true;
 
 const connectedSound =
-document.getElementById("connectedSound");
+new Audio("./connected.mp3");
+
+/* unlock browser audio */
+document.body.addEventListener("click", async () => {
+
+try {
+
+await ringtone.play();
+ringtone.pause();
+ringtone.currentTime = 0;
+
+await connectedSound.play();
+connectedSound.pause();
+connectedSound.currentTime = 0;
+
+} catch(e) {
+console.log(e);
+}
+
+}, { once:true });
 
 /* =========================
    WEBRTC CORE
@@ -61,112 +86,148 @@ let hasCreatedOffer = false;
 let hasSetRemote = false;
 
 const servers = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" }
-  ]
+iceServers: [
+{ urls: "stun:stun.l.google.com:19302" }
+]
 };
 
-/* GET MIC */
+/* =========================
+   GET MIC
+========================= */
+
 async function initMedia() {
 
-  if (localStream) return;
+if (localStream) return;
 
-  localStream = await navigator.mediaDevices.getUserMedia({
-    audio: true,
-    video: false
-  });
-}
+localStream =
+await navigator.mediaDevices.getUserMedia({
+audio: true,
+video: false
+});
 
-/* CREATE PEER */
-function createPeer() {
-
-  if (peerConnection) return;
-
-  peerConnection = new RTCPeerConnection(servers);
-
-  localStream.getTracks().forEach(track => {
-    peerConnection.addTrack(track, localStream);
-  });
-
-  peerConnection.ontrack = (event) => {
-
-    remoteAudio.srcObject = event.streams[0];
-
-    remoteAudio.play().catch(()=>{});
-
-  };
-
-  peerConnection.onicecandidate = async (event) => {
-
-    if (event.candidate) {
-
-      await setDoc(roomRef, {
-        candidates: arrayUnion(
-          JSON.stringify(event.candidate)
-        )
-      }, { merge: true });
-
-    }
-  };
-
-  peerConnection.onconnectionstatechange = () => {
-
-    console.log(
-      "STATE:",
-      peerConnection.connectionState
-    );
-
-    if (
-      peerConnection.connectionState ===
-      "connected"
-    ) {
-
-      ringtone.pause();
-      ringtone.currentTime = 0;
-
-      connectedSound.play();
-
-      callText.textContent = "CONNECTED";
-
-      callImage.src = "imageoncall.jpg";
-
-      incomingButtons.style.display = "none";
-    }
-  };
 }
 
 /* =========================
-   START CALL (CALLER)
+   CREATE PEER
+========================= */
+
+function createPeer() {
+
+if (peerConnection) return;
+
+peerConnection =
+new RTCPeerConnection(servers);
+
+localStream.getTracks().forEach(track => {
+
+peerConnection.addTrack(
+track,
+localStream
+);
+
+});
+
+peerConnection.ontrack = (event) => {
+
+remoteAudio.srcObject =
+event.streams[0];
+
+remoteAudio.play().catch(()=>{});
+
+};
+
+peerConnection.onicecandidate =
+async (event) => {
+
+if (event.candidate) {
+
+await setDoc(roomRef, {
+candidates: arrayUnion(
+JSON.stringify(event.candidate)
+)
+}, { merge: true });
+
+}
+
+};
+
+peerConnection.onconnectionstatechange =
+() => {
+
+console.log(
+"STATE:",
+peerConnection.connectionState
+);
+
+if (
+peerConnection.connectionState ===
+"connected"
+) {
+
+/* 🔥 STOP RINGTONE */
+ringtone.pause();
+
+ringtone.currentTime = 0;
+
+/* 🔥 PLAY CONNECTED SOUND */
+connectedSound.currentTime = 0;
+
+connectedSound.play().catch(err => {
+console.log(err);
+});
+
+/* UI */
+callText.textContent =
+"CONNECTED";
+
+callImage.src =
+"imageoncall.jpg";
+
+incomingButtons.style.display =
+"none";
+
+}
+
+};
+
+}
+
+/* =========================
+   START CALL
 ========================= */
 
 startBtn.onclick = async () => {
 
+/* RESET */
 hasCreatedOffer = false;
 hasSetRemote = false;
 
 if (peerConnection) {
 
-  peerConnection.close();
+peerConnection.close();
 
-  peerConnection.ontrack = null;
-  peerConnection.onicecandidate = null;
-  peerConnection.onconnectionstatechange = null;
+peerConnection.ontrack = null;
+peerConnection.onicecandidate = null;
+peerConnection.onconnectionstatechange = null;
 
-  peerConnection = null;
+peerConnection = null;
+
 }
 
 remoteAudio.srcObject = null;
-   
+
+/* INIT */
 await initMedia();
 
 createPeer();
 
+/* SHOW POPUP */
 popup.classList.add("show");
 
-/* OUTGOING UI */
+incomingButtons.style.display =
+"none";
 
-incomingButtons.style.display = "none";
-
+/* UI */
 if (currentUser === "ayah") {
 
 callText.textContent =
@@ -185,15 +246,26 @@ callImage.src =
 
 }
 
-ringtone.play().catch(err => {
-  console.log("Audio blocked:", err);
-});
+/* 🔥 PLAY RINGTONE */
+try {
 
+ringtone.currentTime = 0;
+
+await ringtone.play();
+
+} catch(err) {
+
+console.log(err);
+
+}
+
+/* CLEAR OLD STATE */
 await setDoc(roomRef, {
 answer: null,
 candidates: []
 }, { merge:true });
-   
+
+/* OFFER */
 const offer =
 await peerConnection.createOffer();
 
@@ -203,6 +275,7 @@ offer
 
 hasCreatedOffer = true;
 
+/* SEND */
 await setDoc(roomRef, {
 calling: true,
 caller: currentUser,
@@ -213,19 +286,24 @@ candidates: []
 };
 
 /* =========================
-   ACCEPT BUTTON
+   ACCEPT CALL
 ========================= */
 
 async function acceptCall() {
 
+/* STOP RINGTONE */
 ringtone.pause();
 
 ringtone.currentTime = 0;
 
+/* PLAY CONNECTED SOUND */
+connectedSound.currentTime = 0;
+
 connectedSound.play().catch(err => {
-  console.log("Connected sound blocked:", err);
+console.log(err);
 });
 
+/* UI */
 callText.textContent =
 "CONNECTED";
 
@@ -239,20 +317,25 @@ incomingButtons.style.display =
 
 /* ACCEPT */
 acceptBtn.onclick = async () => {
+
 await acceptCall();
+
 };
 
 /* DON'T REJECT */
 rejectBtn.onclick = async () => {
+
 await acceptCall();
+
 };
 
 /* =========================
-   CLOSE CALL
+   END CALL
 ========================= */
 
 closeBtn.onclick = async () => {
 
+/* FIREBASE RESET */
 await setDoc(roomRef, {
 calling: false,
 caller: null,
@@ -261,30 +344,36 @@ answer: null,
 candidates: []
 });
 
+/* HIDE */
 popup.classList.remove("show");
 
+/* AUDIO RESET */
 ringtone.pause();
-
 ringtone.currentTime = 0;
 
+connectedSound.pause();
+connectedSound.currentTime = 0;
+
+/* PEER RESET */
 if (peerConnection) {
 
 peerConnection.close();
 
 peerConnection.ontrack = null;
 peerConnection.onicecandidate = null;
-peerConnection.onconnectionstatechange = null;   
+peerConnection.onconnectionstatechange = null;
 
 peerConnection = null;
 
-remoteAudio.srcObject = null;   
-
 }
 
+/* AUDIO STREAM RESET */
+remoteAudio.srcObject = null;
+
+/* LOCAL RESET */
 localStream = null;
 
 hasCreatedOffer = false;
-
 hasSetRemote = false;
 
 };
@@ -300,7 +389,7 @@ if (!docSnap.exists()) return;
 const data = docSnap.data();
 
 /* =========================
-   CALL RECEIVER FLOW
+   RECEIVER FLOW
 ========================= */
 
 if (
@@ -310,8 +399,7 @@ data.caller !== currentUser
 
 popup.classList.add("show");
 
-/* INCOMING UI */
-
+/* UI */
 incomingButtons.style.display =
 "flex";
 
@@ -333,16 +421,25 @@ callImage.src =
 
 }
 
-ringtone.play().catch(err => {
-  console.log("Audio blocked:", err);
-});
+/* 🔥 PLAY RINGTONE */
+try {
 
+ringtone.currentTime = 0;
+
+await ringtone.play();
+
+} catch(err) {
+
+console.log(err);
+
+}
+
+/* INIT */
 await initMedia();
 
 createPeer();
 
 /* HANDLE OFFER */
-
 if (
 data.offer &&
 !hasSetRemote
@@ -366,6 +463,7 @@ answer: JSON.stringify(answer)
 }, { merge: true });
 
 }
+
 }
 
 /* =========================
@@ -411,12 +509,15 @@ JSON.parse(c)
 
 }
 
+/* =========================
+   CALL ENDED
+========================= */
+
 if (!data.calling) {
 
 popup.classList.remove("show");
 
 ringtone.pause();
-
 ringtone.currentTime = 0;
 
 }
