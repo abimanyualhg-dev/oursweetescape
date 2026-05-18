@@ -404,9 +404,12 @@ const data = docSnap.data();
    RECEIVER FLOW
 ========================= */
 
-if (
-data.calling &&
-data.caller !== currentUser
+if (!data.calling) return;
+
+/* JANGAN PROSES DEVICE CALLER */
+if (data.caller === currentUser) return;
+
+/* BARU RECEIVER */
 ) {
 
 popup.classList.add("show");
