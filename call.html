@@ -72,6 +72,22 @@
 
 const user = localStorage.getItem("loggedInUser");
 
+document.body.addEventListener("click", () => {
+
+  const ringtone =
+  document.getElementById("ringtone");
+
+  ringtone.play()
+  .then(() => {
+
+    ringtone.pause();
+    ringtone.currentTime = 0;
+
+  })
+  .catch(()=>{});
+
+}, { once:true });  
+
 if (!user) {
   window.location.href = "index.html";
 }
