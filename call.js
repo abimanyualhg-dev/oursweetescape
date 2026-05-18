@@ -26,7 +26,7 @@ const remoteAudio =
 document.getElementById("remoteAudio");
 
 /* =========================
-   UI ELEMENTS
+   UI
 ========================= */
 
 const callText =
@@ -56,24 +56,29 @@ ringtone.loop = true;
 const connectedSound =
 new Audio("connected.mp3");
 
-/* unlock audio */
+/* unlock browser audio */
+
 document.body.addEventListener("click", async () => {
 
 try {
 
 await ringtone.play();
+
 ringtone.pause();
+
 ringtone.currentTime = 0;
 
 await connectedSound.play();
+
 connectedSound.pause();
+
 connectedSound.currentTime = 0;
 
 } catch(e) {
 console.log(e);
 }
 
-}, { once:true });
+},{ once:true });
 
 /* =========================
    WEBRTC
@@ -88,12 +93,14 @@ let connectedPlayed = false;
 
 const servers = {
 iceServers: [
-{ urls:"stun:stun.l.google.com:19302" }
+{
+urls:"stun:stun.l.google.com:19302"
+}
 ]
 };
 
 /* =========================
-   GET MIC
+   GET MEDIA
 ========================= */
 
 async function initMedia() {
@@ -165,7 +172,7 @@ peerConnection.connectionState
 }
 
 /* =========================
-   SHOW CONNECTED UI
+   CONNECTED UI
 ========================= */
 
 async function showConnectedUI() {
@@ -174,12 +181,25 @@ if (connectedPlayed) return;
 
 connectedPlayed = true;
 
+/* stop ringtone */
+
 ringtone.pause();
+
 ringtone.currentTime = 0;
+
+/* play connected */
+
+try {
 
 connectedSound.currentTime = 0;
 
-connectedSound.play().catch(()=>{});
+await connectedSound.play();
+
+} catch(e) {
+console.log(e);
+}
+
+/* ui */
 
 callText.textContent =
 "CONNECTED";
@@ -217,7 +237,7 @@ await initMedia();
 
 createPeer();
 
-/* UI */
+/* caller ui */
 
 popup.classList.add("show");
 
@@ -254,15 +274,18 @@ await ringtone.play();
 console.log(e);
 }
 
-/* reset old */
+/* clear old */
 
 await setDoc(roomRef,{
+calling:true,
+caller:currentUser,
+offer:null,
 answer:null,
 accepted:false,
 candidates:[]
-},{ merge:true });
+});
 
-/* offer */
+/* create offer */
 
 const offer =
 await peerConnection.createOffer();
@@ -273,29 +296,25 @@ offer
 
 hasCreatedOffer = true;
 
-/* send */
+/* send offer */
 
 await setDoc(roomRef,{
-calling:true,
-caller:currentUser,
-offer:JSON.stringify(offer),
-accepted:false,
-candidates:[]
-});
+offer:JSON.stringify(offer)
+},{ merge:true });
 
 };
 
 /* =========================
-   ACCEPT
+   ACCEPT BUTTON
 ========================= */
 
 async function fakeAccept() {
 
-/* local UI */
+/* LOCAL UI */
 
 await showConnectedUI();
 
-/* broadcast */
+/* BROADCAST */
 
 await setDoc(roomRef,{
 accepted:true
@@ -337,9 +356,11 @@ candidates:[]
 popup.classList.remove("show");
 
 ringtone.pause();
+
 ringtone.currentTime = 0;
 
 connectedSound.pause();
+
 connectedSound.currentTime = 0;
 
 if (peerConnection) {
@@ -361,7 +382,7 @@ connectedPlayed = false;
 };
 
 /* =========================
-   REALTIME
+   REALTIME LISTENER
 ========================= */
 
 onSnapshot(roomRef, async (docSnap) => {
@@ -379,6 +400,7 @@ if (!data.calling) {
 popup.classList.remove("show");
 
 ringtone.pause();
+
 ringtone.currentTime = 0;
 
 return;
@@ -386,7 +408,7 @@ return;
 }
 
 /* =========================
-   BOTH CONNECTED UI
+   BOTH CONNECTED
 ========================= */
 
 if (data.accepted) {
@@ -404,7 +426,8 @@ if (data.caller === currentUser) {
 if (
 data.answer &&
 peerConnection &&
-hasCreatedOffer
+hasCreatedOffer &&
+!peerConnection.currentRemoteDescription
 ) {
 
 try {
@@ -413,15 +436,30 @@ await peerConnection.setRemoteDescription(
 JSON.parse(data.answer)
 );
 
-} catch(e) {}
+} catch(e) {
+console.log(e);
+}
 
 }
 
-/* 🔥 CALLER JUGA HARUS BISA CONNECTED */
+/* ice */
 
-if (data.accepted) {
+if (
+data.candidates &&
+peerConnection
+) {
 
-await showConnectedUI();
+for (let c of data.candidates) {
+
+try {
+
+await peerConnection.addIceCandidate(
+JSON.parse(c)
+);
+
+} catch(e) {}
+
+}
 
 }
 
@@ -432,6 +470,13 @@ return;
 /* =========================
    RECEIVER FLOW
 ========================= */
+
+/* 🔥 PENTING:
+   JANGAN RENDER ULANG
+   KALAU SUDAH CONNECTED
+*/
+
+if (!data.accepted) {
 
 popup.classList.add("show");
 
@@ -460,16 +505,14 @@ callImage.src =
 
 try {
 
-if (!data.accepted) {
-
 ringtone.currentTime = 0;
 
 await ringtone.play();
 
-}
-
 } catch(e) {
 console.log(e);
+}
+
 }
 
 /* webrtc */
@@ -478,7 +521,7 @@ await initMedia();
 
 createPeer();
 
-/* offer */
+/* handle offer */
 
 if (
 data.offer &&
