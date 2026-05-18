@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AG Couple Private Site</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<section class="panel memories" id="privatePage">
+
+<img src="sakurakiri.png" class="sakura left">
+<img src="sakurakanan.png" class="sakura right">
+
+<h2>AG COUPLE PRIVATE SITE</h2>
+
+<p id="loggedUser"></p>
+
+<button id="startCallBtn">
+Start Voice Call
+</button>
+
+<button id="logoutBtn">
+Logout
+</button>
+
+</section>
+
+<div id="callPopup">
+
+<div class="call-box">
+
+<img src="imageoncall.jpg" id="callImage">
+
+<button id="closeCallPopup">
+Close
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const user = localStorage.getItem("loggedInUser");
+
+if(!user){
+window.location.href = "index.html";
+}
+
+document.getElementById("loggedUser").textContent =
+"Logged in as: " + user;
+
+setTimeout(()=>{
+document
+.getElementById("privatePage")
+.classList.add("show");
+},300);
+
+document.getElementById("logoutBtn").onclick = ()=>{
+localStorage.removeItem("loggedInUser");
+window.location.href = "index.html";
+};
+
+const popup =
+document.getElementById("callPopup");
+
+document.getElementById("startCallBtn").onclick = ()=>{
+popup.classList.add("show");
+};
+
+document.getElementById("closeCallPopup").onclick = ()=>{
+popup.classList.remove("show");
+};
+
+</script>
+
+<script type="module" src="call.js"></script>
+
+</body>
+</html>

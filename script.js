@@ -36,12 +36,12 @@ updateTimer();
 
 const memories = document.querySelector(".memories");
 
-window.addEventListener("scroll", () => {
+window.addEventListener("scroll",()=>{
 
 const sectionTop = memories.getBoundingClientRect().top;
 const sectionBottom = memories.getBoundingClientRect().bottom;
 
-if (
+if(
 sectionTop < window.innerHeight * 0.75 &&
 sectionBottom > window.innerHeight * 0.25
 ){
@@ -52,12 +52,16 @@ memories.classList.remove("show");
 
 });
 
-const btn=document.getElementById("generateBtn");
-const output=document.getElementById("quoteOutput");
+const btn = document.getElementById("generateBtn");
+const output = document.getElementById("quoteOutput");
 
 btn.addEventListener("click",()=>{
-const quote=quotes[Math.floor(Math.random()*quotes.length)];
+
+const quote =
+quotes[Math.floor(Math.random()*quotes.length)];
+
 typeWriter(quote);
+
 });
 
 function typeWriter(text){
@@ -66,12 +70,37 @@ output.innerHTML="";
 let i=0;
 
 const typing=setInterval(()=>{
-output.innerHTML+=text.charAt(i);
+
+output.innerHTML += text.charAt(i);
+
 i++;
 
 if(i>=text.length){
 clearInterval(typing);
 }
+
 },40);
 
 }
+
+/* LOGIN POPUP */
+
+const loginBtn =
+document.getElementById("loginBtn");
+
+const loginPopup =
+document.getElementById("loginPopup");
+
+loginBtn.addEventListener("click",()=>{
+
+loginPopup.classList.add("show");
+
+});
+
+loginPopup.addEventListener("click",(e)=>{
+
+if(e.target===loginPopup){
+loginPopup.classList.remove("show");
+}
+
+});
