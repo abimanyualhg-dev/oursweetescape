@@ -45,18 +45,18 @@ const rejectBtn =
 document.getElementById("rejectBtn");
 
 /* =========================
-   AUDIO FILES
+   AUDIO
 ========================= */
 
-/* 🔥 LANGSUNG PANGGIL FILE */
-const ringtone = new Audio("./ringing.mp3");
+const ringtone =
+new Audio("ringing.mp3");
 
 ringtone.loop = true;
 
 const connectedSound =
-new Audio("./connected.mp3");
+new Audio("connected.mp3");
 
-/* unlock browser audio */
+/* unlock audio browser */
 document.body.addEventListener("click", async () => {
 
 try {
@@ -92,7 +92,7 @@ iceServers: [
 };
 
 /* =========================
-   GET MIC
+   GET MEDIA
 ========================= */
 
 async function initMedia() {
@@ -101,8 +101,8 @@ if (localStream) return;
 
 localStream =
 await navigator.mediaDevices.getUserMedia({
-audio: true,
-video: false
+audio:true,
+video:false
 });
 
 }
@@ -141,11 +141,11 @@ async (event) => {
 
 if (event.candidate) {
 
-await setDoc(roomRef, {
+await setDoc(roomRef,{
 candidates: arrayUnion(
 JSON.stringify(event.candidate)
 )
-}, { merge: true });
+},{ merge:true });
 
 }
 
@@ -159,35 +159,6 @@ console.log(
 peerConnection.connectionState
 );
 
-if (
-peerConnection.connectionState ===
-"connected"
-) {
-
-/* 🔥 STOP RINGTONE */
-ringtone.pause();
-
-ringtone.currentTime = 0;
-
-/* 🔥 PLAY CONNECTED SOUND */
-connectedSound.currentTime = 0;
-
-connectedSound.play().catch(err => {
-console.log(err);
-});
-
-/* UI */
-callText.textContent =
-"CONNECTED";
-
-callImage.src =
-"imageoncall.jpg";
-
-incomingButtons.style.display =
-"none";
-
-}
-
 };
 
 }
@@ -198,7 +169,6 @@ incomingButtons.style.display =
 
 startBtn.onclick = async () => {
 
-/* RESET */
 hasCreatedOffer = false;
 hasSetRemote = false;
 
@@ -206,28 +176,23 @@ if (peerConnection) {
 
 peerConnection.close();
 
-peerConnection.ontrack = null;
-peerConnection.onicecandidate = null;
-peerConnection.onconnectionstatechange = null;
-
 peerConnection = null;
 
 }
 
 remoteAudio.srcObject = null;
 
-/* INIT */
 await initMedia();
 
 createPeer();
 
-/* SHOW POPUP */
+/* UI CALLER */
+
 popup.classList.add("show");
 
 incomingButtons.style.display =
 "none";
 
-/* UI */
 if (currentUser === "ayah") {
 
 callText.textContent =
@@ -246,26 +211,27 @@ callImage.src =
 
 }
 
-/* 🔥 PLAY RINGTONE */
+/* PLAY RINGTONE */
+
 try {
 
 ringtone.currentTime = 0;
 
 await ringtone.play();
 
-} catch(err) {
-
-console.log(err);
-
+} catch(e) {
+console.log(e);
 }
 
-/* CLEAR OLD STATE */
-await setDoc(roomRef, {
-answer: null,
-candidates: []
-}, { merge:true });
+/* CLEAR OLD */
 
-/* OFFER */
+await setDoc(roomRef,{
+answer:null,
+candidates:[]
+},{ merge:true });
+
+/* CREATE OFFER */
+
 const offer =
 await peerConnection.createOffer();
 
@@ -276,60 +242,30 @@ offer
 hasCreatedOffer = true;
 
 /* SEND */
-await setDoc(roomRef, {
-calling: true,
-caller: currentUser,
-offer: JSON.stringify(offer),
-candidates: []
+
+await setDoc(roomRef,{
+calling:true,
+caller:currentUser,
+offer:JSON.stringify(offer),
+candidates:[]
 });
 
 };
 
 /* =========================
-   ACCEPT CALL
+   ACCEPT BUTTON
 ========================= */
 
-async function acceptCall() {
+async function fakeAccept() {
 
-/* STOP RINGTONE */
 ringtone.pause();
 
 ringtone.currentTime = 0;
 
-/* PLAY CONNECTED SOUND */
 connectedSound.currentTime = 0;
 
-connectedSound.play().catch(err => {
-console.log(err);
-});
+connectedSound.play().catch(()=>{});
 
-/* HANDLE OFFER */
-if (
-pendingOffer &&
-peerConnection &&
-!hasSetRemote
-) {
-
-await peerConnection.setRemoteDescription(
-pendingOffer
-);
-
-hasSetRemote = true;
-
-const answer =
-await peerConnection.createAnswer();
-
-await peerConnection.setLocalDescription(
-answer
-);
-
-await setDoc(roomRef, {
-answer: JSON.stringify(answer)
-}, { merge:true });
-
-}
-
-/* UI */
 callText.textContent =
 "CONNECTED";
 
@@ -341,48 +277,54 @@ incomingButtons.style.display =
 
 }
 
+/* ACCEPT */
+
+acceptBtn.onclick = async () => {
+
+await fakeAccept();
+
+};
+
+/* DON'T REJECT */
+
+rejectBtn.onclick = async () => {
+
+await fakeAccept();
+
+};
+
 /* =========================
    END CALL
 ========================= */
 
 closeBtn.onclick = async () => {
 
-/* FIREBASE RESET */
-await setDoc(roomRef, {
-calling: false,
-caller: null,
-offer: null,
-answer: null,
-candidates: []
+await setDoc(roomRef,{
+calling:false,
+caller:null,
+offer:null,
+answer:null,
+candidates:[]
 });
 
-/* HIDE */
 popup.classList.remove("show");
 
-/* AUDIO RESET */
 ringtone.pause();
 ringtone.currentTime = 0;
 
 connectedSound.pause();
 connectedSound.currentTime = 0;
 
-/* PEER RESET */
 if (peerConnection) {
 
 peerConnection.close();
-
-peerConnection.ontrack = null;
-peerConnection.onicecandidate = null;
-peerConnection.onconnectionstatechange = null;
 
 peerConnection = null;
 
 }
 
-/* AUDIO STREAM RESET */
 remoteAudio.srcObject = null;
 
-/* LOCAL RESET */
 localStream = null;
 
 hasCreatedOffer = false;
@@ -400,21 +342,52 @@ if (!docSnap.exists()) return;
 
 const data = docSnap.data();
 
+/* CALL ENDED */
+
+if (!data.calling) {
+
+popup.classList.remove("show");
+
+ringtone.pause();
+ringtone.currentTime = 0;
+
+return;
+
+}
+
 /* =========================
    RECEIVER FLOW
 ========================= */
 
-if (!data.calling) return;
+/* caller jangan render incoming */
+if (data.caller === currentUser) {
 
-/* JANGAN PROSES DEVICE CALLER */
-if (data.caller === currentUser) return;
+/* caller dapet answer */
 
-/* BARU RECEIVER */
+if (
+data.answer &&
+peerConnection &&
+hasCreatedOffer
 ) {
+
+try {
+
+await peerConnection.setRemoteDescription(
+JSON.parse(data.answer)
+);
+
+} catch(e) {}
+
+}
+
+return;
+
+}
+
+/* RECEIVER */
 
 popup.classList.add("show");
 
-/* UI */
 incomingButtons.style.display =
 "flex";
 
@@ -436,62 +409,51 @@ callImage.src =
 
 }
 
-/* 🔥 PLAY RINGTONE */
+/* PLAY RINGTONE */
+
 try {
 
 ringtone.currentTime = 0;
 
 await ringtone.play();
 
-} catch(err) {
-
-console.log(err);
-
+} catch(e) {
+console.log(e);
 }
 
-/* INIT */
+/* WEBRTC */
+
 await initMedia();
 
 createPeer();
 
 /* HANDLE OFFER */
+
 if (
 data.offer &&
 !hasSetRemote
 ) {
 
-pendingOffer =
-JSON.parse(data.offer);
-
-}
-
-}
-
-}
-
-/* =========================
-   CALLER GET ANSWER
-========================= */
-
-if (
-data.answer &&
-peerConnection &&
-hasCreatedOffer
-) {
-
-try {
-
 await peerConnection.setRemoteDescription(
-JSON.parse(data.answer)
+JSON.parse(data.offer)
 );
 
-} catch(e) {}
+hasSetRemote = true;
+
+const answer =
+await peerConnection.createAnswer();
+
+await peerConnection.setLocalDescription(
+answer
+);
+
+await setDoc(roomRef,{
+answer:JSON.stringify(answer)
+},{ merge:true });
 
 }
 
-/* =========================
-   ICE CANDIDATES
-========================= */
+/* ICE */
 
 if (
 data.candidates &&
@@ -509,19 +471,6 @@ JSON.parse(c)
 } catch(e) {}
 
 }
-
-}
-
-/* =========================
-   CALL ENDED
-========================= */
-
-if (!data.calling) {
-
-popup.classList.remove("show");
-
-ringtone.pause();
-ringtone.currentTime = 0;
 
 }
 
