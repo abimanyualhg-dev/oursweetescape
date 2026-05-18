@@ -303,6 +303,32 @@ connectedSound.play().catch(err => {
 console.log(err);
 });
 
+/* HANDLE OFFER */
+if (
+pendingOffer &&
+peerConnection &&
+!hasSetRemote
+) {
+
+await peerConnection.setRemoteDescription(
+pendingOffer
+);
+
+hasSetRemote = true;
+
+const answer =
+await peerConnection.createAnswer();
+
+await peerConnection.setLocalDescription(
+answer
+);
+
+await setDoc(roomRef, {
+answer: JSON.stringify(answer)
+}, { merge:true });
+
+}
+
 /* UI */
 callText.textContent =
 "CONNECTED";
@@ -314,20 +340,6 @@ incomingButtons.style.display =
 "none";
 
 }
-
-/* ACCEPT */
-acceptBtn.onclick = async () => {
-
-await acceptCall();
-
-};
-
-/* DON'T REJECT */
-rejectBtn.onclick = async () => {
-
-await acceptCall();
-
-};
 
 /* =========================
    END CALL
@@ -445,22 +457,10 @@ data.offer &&
 !hasSetRemote
 ) {
 
-await peerConnection.setRemoteDescription(
-JSON.parse(data.offer)
-);
+pendingOffer =
+JSON.parse(data.offer);
 
-hasSetRemote = true;
-
-const answer =
-await peerConnection.createAnswer();
-
-await peerConnection.setLocalDescription(
-answer
-);
-
-await setDoc(roomRef, {
-answer: JSON.stringify(answer)
-}, { merge: true });
+}
 
 }
 
