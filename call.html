@@ -72,25 +72,41 @@
 
 const user = localStorage.getItem("loggedInUser");
 
-document.body.addEventListener("click", () => {
-
-  const ringtone =
-  document.getElementById("ringtone");
-
-  ringtone.play()
-  .then(() => {
-
-    ringtone.pause();
-    ringtone.currentTime = 0;
-
-  })
-  .catch(()=>{});
-
-}, { once:true });  
-
 if (!user) {
   window.location.href = "index.html";
 }
+
+/* =========================
+   AUDIO FILES
+========================= */
+
+const ringtone = new Audio("ringing.mp3");
+ringtone.loop = true;
+
+const connectedSound = new Audio("connected.mp3");
+
+/* unlock audio */
+document.body.addEventListener("click", async () => {
+
+  try {
+
+    await ringtone.play();
+    ringtone.pause();
+    ringtone.currentTime = 0;
+
+    await connectedSound.play();
+    connectedSound.pause();
+    connectedSound.currentTime = 0;
+
+  } catch(e) {
+    console.log(e);
+  }
+
+}, { once:true });
+
+/* =========================
+   UI
+========================= */
 
 document.getElementById("loggedUser").textContent =
 "Logged in as: " + user;
@@ -104,19 +120,17 @@ document.getElementById("logoutBtn").onclick = () => {
   window.location.href = "index.html";
 };
 
-const popup = document.getElementById("callPopup");
+const popup =
+document.getElementById("callPopup");
 
-const callText = document.getElementById("callText");
-const callImage = document.getElementById("callImage");
+const callText =
+document.getElementById("callText");
+
+const callImage =
+document.getElementById("callImage");
 
 const incomingButtons =
 document.getElementById("incomingButtons");
-
-const ringtone =
-document.getElementById("ringtone");
-
-const connectedSound =
-document.getElementById("connectedSound");
 
 const acceptBtn =
 document.getElementById("acceptBtn");
@@ -127,108 +141,156 @@ document.getElementById("rejectBtn");
 const closeBtn =
 document.getElementById("closeCallPopup");
 
-/* ========================= */
-/* START CALL */
-/* ========================= */
+/* =========================
+   START CALL
+========================= */
 
-document.getElementById("startCallBtn").onclick = async () => {
+document.getElementById("startCallBtn").onclick =
+async () => {
 
-  popup.classList.add("show");
+popup.classList.add("show");
 
-  incomingButtons.style.display = "none";
+incomingButtons.style.display = "none";
 
-  if (user === "ayah") {
+if (user === "ayah") {
 
-    callText.textContent = "CALLING BUNDA...";
-    callImage.src = "ayahringing.jpg";
+callText.textContent =
+"CALLING BUNDA...";
 
-  } else {
+callImage.src =
+"ayahringing.jpg";
 
-    callText.textContent = "CALLING AYAH...";
-    callImage.src = "bundaringing.jpg";
+} else {
 
-  }
+callText.textContent =
+"CALLING AYAH...";
 
-  ringtone.play();
+callImage.src =
+"bundaringing.jpg";
 
-  // trigger WebRTC
-  if (window.startVoiceCall) {
-    await window.startVoiceCall();
-  }
+}
+
+/* 🔥 PLAY RINGTONE */
+try {
+
+ringtone.currentTime = 0;
+
+await ringtone.play();
+
+} catch(e) {
+console.log(e);
+}
+
+/* START WEBRTC */
+if (window.startVoiceCall) {
+await window.startVoiceCall();
+}
+
 };
 
-/* ========================= */
-/* FAKE INCOMING CALL */
-/* ========================= */
+/* =========================
+   INCOMING CALL
+========================= */
 
-/*
-INI NANTI BISA LU PANGGIL
-DARI FIREBASE REALTIME EVENT
-*/
+window.showIncomingCall = async (caller) => {
 
-window.showIncomingCall = (caller) => {
+popup.classList.add("show");
 
-  popup.classList.add("show");
+incomingButtons.style.display = "flex";
 
-  incomingButtons.style.display = "flex";
+if (caller === "ayah") {
 
-  if (caller === "ayah") {
+callText.textContent =
+"Ayah is calling...";
 
-    callText.textContent = "Ayah is calling...";
-    callImage.src = "ayahringing.jpg";
+callImage.src =
+"ayahringing.jpg";
 
-  } else {
+} else {
 
-    callText.textContent = "Bunda is calling...";
-    callImage.src = "bundaringing.jpg";
+callText.textContent =
+"Bunda is calling...";
 
-  }
+callImage.src =
+"bundaringing.jpg";
 
-  ringtone.play();
+}
+
+/* 🔥 PLAY RINGTONE */
+try {
+
+ringtone.currentTime = 0;
+
+await ringtone.play();
+
+} catch(e) {
+console.log(e);
+}
+
 };
 
-/* ========================= */
-/* CONNECTED STATE */
-/* ========================= */
+/* =========================
+   CONNECTED
+========================= */
 
-function connectCall() {
+async function connectCall() {
 
-  ringtone.pause();
-  ringtone.currentTime = 0;
+ringtone.pause();
 
-  connectedSound.play();
+ringtone.currentTime = 0;
 
-  incomingButtons.style.display = "none";
+/* 🔥 PLAY CONNECTED SOUND */
+try {
 
-  callText.textContent = "CONNECTED";
+connectedSound.currentTime = 0;
 
-  callImage.src = "imageoncall.jpg";
+await connectedSound.play();
+
+} catch(e) {
+console.log(e);
+}
+
+incomingButtons.style.display =
+"none";
+
+callText.textContent =
+"CONNECTED";
+
+callImage.src =
+"imageoncall.jpg";
+
 }
 
 /* ACCEPT */
-acceptBtn.onclick = () => {
-  connectCall();
+acceptBtn.onclick = async () => {
+await connectCall();
 };
 
 /* DON'T REJECT */
-rejectBtn.onclick = () => {
-  connectCall();
+rejectBtn.onclick = async () => {
+await connectCall();
 };
 
-/* ========================= */
-/* END CALL */
-/* ========================= */
+/* =========================
+   END CALL
+========================= */
 
 closeBtn.onclick = () => {
 
-  popup.classList.remove("show");
+popup.classList.remove("show");
 
-  ringtone.pause();
-  ringtone.currentTime = 0;
+ringtone.pause();
 
-  if (window.endCall) {
-    window.endCall();
-  }
+ringtone.currentTime = 0;
+
+connectedSound.pause();
+
+connectedSound.currentTime = 0;
+
+if (window.endCall) {
+window.endCall();
+}
+
 };
 
 </script>
