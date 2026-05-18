@@ -417,6 +417,14 @@ JSON.parse(data.answer)
 
 }
 
+/* 🔥 CALLER JUGA HARUS BISA CONNECTED */
+
+if (data.accepted) {
+
+await showConnectedUI();
+
+}
+
 return;
 
 }
