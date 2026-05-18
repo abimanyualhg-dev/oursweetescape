@@ -7,8 +7,8 @@
 <title>AG Couple Private Site</title>
 
 <link rel="stylesheet" href="style.css">
-
 </head>
+
 <body>
 
 <section class="panel memories" id="privatePage">
@@ -20,65 +20,65 @@
 
 <p id="loggedUser"></p>
 
-<button id="startCallBtn">
-Start Voice Call
-</button>
-
-<button id="logoutBtn">
-Logout
-</button>
+<button id="startCallBtn">Start Voice Call</button>
+<button id="logoutBtn">Logout</button>
 
 </section>
 
+<!-- CALL POPUP (STATUS CALL) -->
 <div id="callPopup">
+  <div class="call-box">
 
-<div class="call-box">
+    <!-- tetap boleh image, tapi ini bukan voice call -->
+    <img src="imageoncall.jpg" id="callImage">
 
-<img src="imageoncall.jpg" id="callImage">
+    <!-- WAJIB: audio stream dari partner -->
+    <audio id="remoteAudio" autoplay></audio>
 
-<button id="closeCallPopup">
-Close
-</button>
+    <button id="closeCallPopup">Close</button>
 
-</div>
-
+  </div>
 </div>
 
 <script>
-
 const user = localStorage.getItem("loggedInUser");
 
-if(!user){
-window.location.href = "index.html";
+if (!user) {
+  window.location.href = "index.html";
 }
 
 document.getElementById("loggedUser").textContent =
 "Logged in as: " + user;
 
-setTimeout(()=>{
-document
-.getElementById("privatePage")
-.classList.add("show");
-},300);
+setTimeout(() => {
+  document.getElementById("privatePage").classList.add("show");
+}, 300);
 
-document.getElementById("logoutBtn").onclick = ()=>{
-localStorage.removeItem("loggedInUser");
-window.location.href = "index.html";
+document.getElementById("logoutBtn").onclick = () => {
+  localStorage.removeItem("loggedInUser");
+  window.location.href = "index.html";
 };
 
-const popup =
-document.getElementById("callPopup");
+/* popup hanya UI status */
+const popup = document.getElementById("callPopup");
 
-document.getElementById("startCallBtn").onclick = ()=>{
-popup.classList.add("show");
+document.getElementById("startCallBtn").onclick = () => {
+  popup.classList.add("show");
+
+  // 🔥 trigger logic WebRTC di call.js
+  window.startVoiceCall();
 };
 
-document.getElementById("closeCallPopup").onclick = ()=>{
-popup.classList.remove("show");
+document.getElementById("closeCallPopup").onclick = () => {
+  popup.classList.remove("show");
+
+  // optional: end call
+  if (window.endCall) window.endCall();
 };
 
 </script>
 
+<!-- 🔥 LOGIC CALL ASLI DI SINI -->
 <script type="module" src="call.js"></script>
 
 </body>
