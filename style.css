@@ -331,3 +331,55 @@ margin-top:25px;
 #logoutBtn:hover{
 transform:scale(1.06);
 }
+
+#callText{
+font-family:'Playfair Display',serif;
+font-size:1.7rem;
+letter-spacing:2px;
+text-align:center;
+color:white;
+text-shadow:0 0 18px rgba(255,143,199,.5);
+}
+
+#incomingButtons{
+display:none;
+gap:18px;
+justify-content:center;
+align-items:center;
+flex-wrap:wrap;
+}
+
+.pink-btn{
+padding:18px 42px;
+border:none;
+border-radius:999px;
+background:#FF8FC7;
+color:white;
+font-family:'Playfair Display',serif;
+font-size:1rem;
+box-shadow:0 0 24px #FF8FC7;
+transition:.35s;
+}
+
+.pink-btn:hover{
+transform:scale(1.06);
+}
+
+@media(max-width:768px){
+
+#callText{
+font-size:1.2rem;
+padding:0 14px;
+}
+
+#incomingButtons{
+flex-direction:column;
+width:100%;
+}
+
+.pink-btn{
+width:80%;
+max-width:300px;
+}
+
+}
