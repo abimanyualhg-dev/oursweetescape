@@ -20,282 +20,129 @@
 
 <p id="loggedUser"></p>
 
-<button id="startCallBtn">Start Voice Call</button>
-<button id="logoutBtn">Logout</button>
+<button id="startCallBtn">
+Start Voice Call
+</button>
+
+<button id="logoutBtn">
+Logout
+</button>
 
 </section>
 
-<!-- ========================= -->
-<!-- CALL POPUP -->
-<!-- ========================= -->
+<!-- =========================
+     CALL POPUP
+========================= -->
 
 <div id="callPopup">
 
-  <div class="call-box">
+<div class="call-box">
 
-    <h2 id="callText"></h2>
+<h2 id="callText"></h2>
 
-    <img id="callImage" src="" alt="call image">
+<img
+id="callImage"
+src=""
+alt="call image"
+>
 
-    <div id="incomingButtons">
+<div id="incomingButtons">
 
-      <button id="acceptBtn" class="pink-btn">
-        ACCEPT
-      </button>
+<button
+id="acceptBtn"
+class="pink-btn"
+>
+ACCEPT
+</button>
 
-      <button id="rejectBtn" class="pink-btn">
-        DON'T REJECT
-      </button>
-
-    </div>
-
-    <button id="closeCallPopup" class="pink-btn">
-      END CALL
-    </button>
-
-    <!-- audio voice -->
-    <audio id="remoteAudio" autoplay></audio>
-
-  </div>
+<button
+id="rejectBtn"
+class="pink-btn"
+>
+DON'T REJECT
+</button>
 
 </div>
 
-<!-- ========================= -->
-<!-- AUDIO -->
-<!-- ========================= -->
+<button
+id="closeCallPopup"
+class="pink-btn"
+>
+END CALL
+</button>
 
-<audio id="ringtone" src="ringing.mp3" loop></audio>
+<!-- REAL VOICE AUDIO -->
+<audio
+id="remoteAudio"
+autoplay
+></audio>
 
-<audio id="connectedSound" src="connected.mp3"></audio>
+</div>
+
+</div>
 
 <script>
 
-const user = localStorage.getItem("loggedInUser");
+/* =========================
+   AUTH
+========================= */
+
+const user =
+localStorage.getItem(
+"loggedInUser"
+);
 
 if (!user) {
-  window.location.href = "index.html";
+
+window.location.href =
+"index.html";
+
 }
 
 /* =========================
-   AUDIO FILES
+   UI INIT
 ========================= */
 
-const ringtone = new Audio("ringing.mp3");
-ringtone.loop = true;
-
-const connectedSound = new Audio("connected.mp3");
-
-/* unlock audio */
-document.body.addEventListener("click", async () => {
-
-  try {
-
-    await ringtone.play();
-    ringtone.pause();
-    ringtone.currentTime = 0;
-
-    await connectedSound.play();
-    connectedSound.pause();
-    connectedSound.currentTime = 0;
-
-  } catch(e) {
-    console.log(e);
-  }
-
-}, { once:true });
-
-/* =========================
-   UI
-========================= */
-
-document.getElementById("loggedUser").textContent =
+document.getElementById(
+"loggedUser"
+).textContent =
 "Logged in as: " + user;
 
 setTimeout(() => {
-  document.getElementById("privatePage").classList.add("show");
-}, 300);
 
-document.getElementById("logoutBtn").onclick = () => {
-  localStorage.removeItem("loggedInUser");
-  window.location.href = "index.html";
-};
+document
+.getElementById("privatePage")
+.classList.add("show");
 
-const popup =
-document.getElementById("callPopup");
-
-const callText =
-document.getElementById("callText");
-
-const callImage =
-document.getElementById("callImage");
-
-const incomingButtons =
-document.getElementById("incomingButtons");
-
-const acceptBtn =
-document.getElementById("acceptBtn");
-
-const rejectBtn =
-document.getElementById("rejectBtn");
-
-const closeBtn =
-document.getElementById("closeCallPopup");
+},300);
 
 /* =========================
-   START CALL
+   LOGOUT
 ========================= */
 
-document.getElementById("startCallBtn").onclick =
-async () => {
+document
+.getElementById("logoutBtn")
+.onclick = () => {
 
-popup.classList.add("show");
+localStorage.removeItem(
+"loggedInUser"
+);
 
-incomingButtons.style.display = "none";
-
-if (user === "ayah") {
-
-callText.textContent =
-"CALLING BUNDA...";
-
-callImage.src =
-"ayahringing.jpg";
-
-} else {
-
-callText.textContent =
-"CALLING AYAH...";
-
-callImage.src =
-"bundaringing.jpg";
-
-}
-
-/* 🔥 PLAY RINGTONE */
-try {
-
-ringtone.currentTime = 0;
-
-await ringtone.play();
-
-} catch(e) {
-console.log(e);
-}
-
-/* START WEBRTC */
-if (window.startVoiceCall) {
-await window.startVoiceCall();
-}
-
-};
-
-/* =========================
-   INCOMING CALL
-========================= */
-
-window.showIncomingCall = async (caller) => {
-
-popup.classList.add("show");
-
-incomingButtons.style.display = "flex";
-
-if (caller === "ayah") {
-
-callText.textContent =
-"Ayah is calling...";
-
-callImage.src =
-"ayahringing.jpg";
-
-} else {
-
-callText.textContent =
-"Bunda is calling...";
-
-callImage.src =
-"bundaringing.jpg";
-
-}
-
-/* 🔥 PLAY RINGTONE */
-try {
-
-ringtone.currentTime = 0;
-
-await ringtone.play();
-
-} catch(e) {
-console.log(e);
-}
-
-};
-
-/* =========================
-   CONNECTED
-========================= */
-
-async function connectCall() {
-
-ringtone.pause();
-
-ringtone.currentTime = 0;
-
-/* 🔥 PLAY CONNECTED SOUND */
-try {
-
-connectedSound.currentTime = 0;
-
-await connectedSound.play();
-
-} catch(e) {
-console.log(e);
-}
-
-incomingButtons.style.display =
-"none";
-
-callText.textContent =
-"CONNECTED";
-
-callImage.src =
-"imageoncall.jpg";
-
-}
-
-/* ACCEPT */
-acceptBtn.onclick = async () => {
-await connectCall();
-};
-
-/* DON'T REJECT */
-rejectBtn.onclick = async () => {
-await connectCall();
-};
-
-/* =========================
-   END CALL
-========================= */
-
-closeBtn.onclick = () => {
-
-popup.classList.remove("show");
-
-ringtone.pause();
-
-ringtone.currentTime = 0;
-
-connectedSound.pause();
-
-connectedSound.currentTime = 0;
-
-if (window.endCall) {
-window.endCall();
-}
+window.location.href =
+"index.html";
 
 };
 
 </script>
 
-<script type="module" src="call.js"></script>
+<!-- =========================
+     REAL CALL SYSTEM
+========================= -->
+
+<script
+type="module"
+src="call.js"
+></script>
 
 </body>
 </html>
