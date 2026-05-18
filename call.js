@@ -141,6 +141,22 @@ function createPeer() {
 
 startBtn.onclick = async () => {
 
+hasCreatedOffer = false;
+hasSetRemote = false;
+
+if (peerConnection) {
+
+  peerConnection.close();
+
+  peerConnection.ontrack = null;
+  peerConnection.onicecandidate = null;
+  peerConnection.onconnectionstatechange = null;
+
+  peerConnection = null;
+}
+
+remoteAudio.srcObject = null;
+   
 await initMedia();
 
 createPeer();
@@ -169,8 +185,15 @@ callImage.src =
 
 }
 
-ringtone.play();
+ringtone.play().catch(err => {
+  console.log("Audio blocked:", err);
+});
 
+await setDoc(roomRef, {
+answer: null,
+candidates: []
+}, { merge:true });
+   
 const offer =
 await peerConnection.createOffer();
 
@@ -199,7 +222,9 @@ ringtone.pause();
 
 ringtone.currentTime = 0;
 
-connectedSound.play();
+connectedSound.play().catch(err => {
+  console.log("Connected sound blocked:", err);
+});
 
 callText.textContent =
 "CONNECTED";
@@ -246,7 +271,13 @@ if (peerConnection) {
 
 peerConnection.close();
 
+peerConnection.ontrack = null;
+peerConnection.onicecandidate = null;
+peerConnection.onconnectionstatechange = null;   
+
 peerConnection = null;
+
+remoteAudio.srcObject = null;   
 
 }
 
@@ -302,7 +333,9 @@ callImage.src =
 
 }
 
-ringtone.play();
+ringtone.play().catch(err => {
+  console.log("Audio blocked:", err);
+});
 
 await initMedia();
 
