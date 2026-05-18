@@ -49,36 +49,14 @@ document.getElementById("rejectBtn");
 ========================= */
 
 const ringtone =
-new Audio("ringing.mp3");
-
-ringtone.loop = true;
+document.getElementById(
+"ringtone"
+);
 
 const connectedSound =
-new Audio("connected.mp3");
-
-/* unlock browser audio */
-
-document.body.addEventListener("click", async () => {
-
-try {
-
-await ringtone.play();
-
-ringtone.pause();
-
-ringtone.currentTime = 0;
-
-await connectedSound.play();
-
-connectedSound.pause();
-
-connectedSound.currentTime = 0;
-
-} catch(e) {
-console.log(e);
-}
-
-},{ once:true });
+document.getElementById(
+"connectedSound"
+);
 
 /* =========================
    WEBRTC
