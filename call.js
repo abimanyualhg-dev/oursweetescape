@@ -159,12 +159,6 @@ if (connectedPlayed) return;
 
 connectedPlayed = true;
 
-/* stop ringtone */
-
-ringtone.pause();
-
-ringtone.currentTime = 0;
-
 /* play connected */
 
 try {
@@ -333,10 +327,6 @@ candidates:[]
 
 popup.classList.remove("show");
 
-ringtone.pause();
-
-ringtone.currentTime = 0;
-
 connectedSound.pause();
 
 connectedSound.currentTime = 0;
@@ -448,11 +438,6 @@ return;
 /* =========================
    RECEIVER FLOW
 ========================= */
-
-/* 🔥 PENTING:
-   JANGAN RENDER ULANG
-   KALAU SUDAH CONNECTED
-*/
 
 if (!data.accepted) {
 
