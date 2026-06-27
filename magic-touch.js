@@ -3,13 +3,19 @@ const video = document.getElementById("webcam");
 async function startCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
+      video: {
+        facingMode: "user",
+        width: 640,
+        height: 480
+      },
       audio: false
     });
 
     video.srcObject = stream;
-  } catch (err) {
-    console.error("Camera error:", err);
+
+    console.log("Camera started.");
+  } catch (error) {
+    console.error("Failed to access camera:", error);
   }
 }
 
