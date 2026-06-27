@@ -104,3 +104,12 @@ loginPopup.classList.remove("show");
 }
 
 });
+
+/* MAGIC TOUCH */
+const magicTouchBtn = document.getElementById("magicTouchBtn");
+
+if (magicTouchBtn) {
+  magicTouchBtn.addEventListener("click", () => {
+    window.location.href = "magic-touch.html";
+  });
+}
