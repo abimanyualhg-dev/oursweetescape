@@ -123,7 +123,7 @@ function animate(t) {
   requestAnimationFrame(animate);
 }
 
-animate();
+requestAnimationFrame(animate);
 
 
 // ======================
