@@ -216,6 +216,8 @@ hands.setOptions({
   minTrackingConfidence: 0.7
 });
 
+let currentGesture = "NONE";
+
 hands.onResults((results) => {
 
   handCtx.clearRect(
@@ -225,33 +227,106 @@ hands.onResults((results) => {
     handCanvas.height
   );
 
-  if (!results.multiHandLandmarks) return;
+  let gesture = "NONE";
 
-  for (const landmarks of results.multiHandLandmarks) {
+  if (results.multiHandLandmarks) {
 
-    drawConnectors(
-      handCtx,
-      landmarks,
-      HAND_CONNECTIONS,
-      {
-        color: "rgba(255,182,217,0.55)",
-        lineWidth: 1
-      }
-    );
+    for (const landmarks of results.multiHandLandmarks) {
 
-    for (const point of landmarks) {
-      handCtx.beginPath();
-      handCtx.arc(
-        point.x * handCanvas.width,
-        point.y * handCanvas.height,
-        2,
-        0,
-        Math.PI * 2
+      // Garis tangan
+      drawConnectors(
+        handCtx,
+        landmarks,
+        HAND_CONNECTIONS,
+        {
+          color: "rgba(255,182,217,0.55)",
+          lineWidth: 1
+        }
       );
 
-      handCtx.fillStyle = "#ffb6d9";
-      handCtx.fill();
+      // Titik tangan
+      for (const point of landmarks) {
+        handCtx.beginPath();
+        handCtx.arc(
+          point.x * handCanvas.width,
+          point.y * handCanvas.height,
+          2,
+          0,
+          Math.PI * 2
+        );
+
+        handCtx.fillStyle = "#ffb6d9";
+        handCtx.fill();
+      }
+
+      // ======================
+      // GESTURE DETECTION
+      // ======================
+
+      const index =
+        landmarks[8].y <
+        landmarks[6].y;
+
+      const middle =
+        landmarks[12].y <
+        landmarks[10].y;
+
+      const ring =
+        landmarks[16].y <
+        landmarks[14].y;
+
+      const pinky =
+        landmarks[20].y <
+        landmarks[18].y;
+
+      // 🖐 OPEN PALM
+      if (
+        index &&
+        middle &&
+        ring &&
+        pinky
+      ) {
+        gesture = "OPEN_PALM";
+      }
+
+      // ✊ FIST
+      else if (
+        !index &&
+        !middle &&
+        !ring &&
+        !pinky
+      ) {
+        gesture = "FIST";
+      }
+
+      // ☝️ POINT UP
+      else if (
+        index &&
+        !middle &&
+        !ring &&
+        !pinky
+      ) {
+        gesture = "POINT_UP";
+      }
+
+      // ✌️ PEACE
+      else if (
+        index &&
+        middle &&
+        !ring &&
+        !pinky
+      ) {
+        gesture = "PEACE";
+      }
     }
+  }
+
+  if (gesture !== currentGesture) {
+    currentGesture = gesture;
+    console.log(
+      "Gesture:",
+      currentGesture
+    );
   }
 });
 
