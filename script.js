@@ -113,3 +113,5 @@ if (magicTouchBtn) {
     window.location.href = "magic-touch.html";
   });
 }
+
+});
