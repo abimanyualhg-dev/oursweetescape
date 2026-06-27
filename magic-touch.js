@@ -44,17 +44,17 @@ class Star {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
 
-    this.vx = (Math.random() - 0.5) * 0.3;
-    this.vy = (Math.random() - 0.5) * 0.3;
+    this.vx = (Math.random() - 0.5) * 0.2;
+    this.vy = (Math.random() - 0.5) * 0.2;
 
-    this.radius = Math.random() * 1.8 + 0.4;
+    this.radius = Math.random() * 1.6 + 0.4;
     this.seed = Math.random() * 1000;
   }
 
   update(t) {
     const time = t * 0.001;
 
-    // idle float motion
+    // slow organic drift
     this.vx += Math.sin(time + this.seed) * 0.002;
     this.vy += Math.cos(time + this.seed) * 0.002;
 
@@ -81,7 +81,7 @@ class Star {
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 
     ctx.fillStyle = "#ffffff";
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 10;
     ctx.shadowColor = "#ffffff";
 
     ctx.fill();
@@ -98,10 +98,11 @@ for (let i = 0; i < 400; i++) {
 
 
 // ======================
-// RENDER LOOP
+// LOOP
 // ======================
 
 function animate(t) {
+
   // background
   const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
   sky.addColorStop(0, "#071021");
@@ -110,7 +111,7 @@ function animate(t) {
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // IMPORTANT: no heavy trail (biar gak ilang)
+  // IMPORTANT: safe fade (NOT destroy visibility)
   ctx.fillStyle = "rgba(0,0,0,0.03)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -141,8 +142,8 @@ video.addEventListener("loadedmetadata", resizeHand);
 window.addEventListener("resize", resizeHand);
 
 const hands = new Hands({
-  locateFile: (f) =>
-    `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+  locateFile: (file) =>
+    `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
 });
 
 hands.setOptions({
