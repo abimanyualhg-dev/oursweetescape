@@ -247,7 +247,7 @@ drawLandmarks(
   {
     color: "#ffffff",
     fillColor: "#ffb6d9",
-    radius: () => 1
+    radius: () => 0.5
   }
 );
 
