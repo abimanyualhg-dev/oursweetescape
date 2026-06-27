@@ -149,7 +149,8 @@ border-radius:28px;
 /* BUTTONS */
 
 #generateBtn,
-#loginBtn{
+#loginBtn,
+#magicTouchBtn{
 padding:18px 42px;
 border:none;
 border-radius:999px;
@@ -162,7 +163,8 @@ transition:.35s;
 }
 
 #generateBtn:hover,
-#loginBtn:hover{
+#loginBtn:hover,
+#magicTouchBtn:hover{
 transform:scale(1.06);
 }
 
