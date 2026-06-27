@@ -35,21 +35,50 @@ window.addEventListener("resize", resize);
 // STAR SYSTEM
 // ======================
 
+function drawStar(ctx, x, y, outerRadius, innerRadius, points, rotation) {
+  ctx.beginPath();
+
+  for (let i = 0; i < points * 2; i++) {
+    const angle = (Math.PI / points) * i + rotation;
+    const r = (i % 2 === 0) ? outerRadius : innerRadius;
+
+    const px = x + Math.cos(angle) * r;
+    const py = y + Math.sin(angle) * r;
+
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+
+  ctx.closePath();
+}
+
 class Star {
   constructor() {
     this.reset();
   }
 
   reset() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
+  this.x = Math.random() * canvas.width;
+  this.y = Math.random() * canvas.height;
 
-    this.vx = (Math.random() - 0.5) * 0.2;
-    this.vy = (Math.random() - 0.5) * 0.2;
+  this.depth = 0.5 + Math.random();
 
-    this.radius = Math.random() * 1.6 + 0.4;
-    this.seed = Math.random() * 1000;
-  }
+  this.vx = (Math.random() - 0.5) * 0.15 * this.depth;
+  this.vy = (Math.random() - 0.5) * 0.15 * this.depth;
+
+  this.radius = 1 + Math.random() * 4;
+
+  this.opacity = 0.35 + Math.random() * 0.65;
+
+  this.seed = Math.random() * 1000;
+
+  this.rotation = Math.random() * Math.PI * 2;
+  this.rotationSpeed = (Math.random() - 0.5) * 0.015;
+
+  this.points = Math.random() > 0.5 ? 4 : 5;
+
+  this.floatOffset = Math.random() * 1000;
+}
 
   update(t) {
     const time = t * 0.001;
@@ -64,6 +93,13 @@ class Star {
     this.x += this.vx;
     this.y += this.vy;
 
+    this.floatOffset += 0.03;
+
+this.x += Math.sin(this.floatOffset) * 0.08;
+this.y += Math.cos(this.floatOffset) * 0.08;
+
+this.rotation += this.rotationSpeed;
+
     // wrap
     if (this.x < 0) this.x = canvas.width;
     if (this.x > canvas.width) this.x = 0;
@@ -72,23 +108,55 @@ class Star {
   }
 
   draw(t) {
-    const glow = 0.5 + 0.5 * Math.sin(t * 0.002 + this.seed);
 
-    ctx.save();
-    ctx.globalAlpha = glow;
+  const twinkle =
+    0.6 +
+    0.4 * Math.sin(t * 0.003 + this.seed);
 
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+  const size =
+    this.radius * this.depth;
 
-    ctx.fillStyle = "#ffffff";
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = "#ffffff";
+  ctx.save();
 
-    ctx.fill();
-    ctx.restore();
-  }
+  ctx.translate(this.x, this.y);
+  ctx.rotate(this.rotation);
+
+  ctx.globalAlpha =
+    this.opacity * twinkle;
+
+  const gradient = ctx.createRadialGradient(
+    0,
+    0,
+    0,
+    0,
+    0,
+    size * 4
+  );
+
+  gradient.addColorStop(0, "#ffffff");
+  gradient.addColorStop(0.25, "#d8ffff");
+  gradient.addColorStop(0.6, "#82f7ff");
+  gradient.addColorStop(1, "rgba(130,247,255,0)");
+
+  ctx.fillStyle = gradient;
+
+  ctx.shadowBlur = 20 * this.depth;
+  ctx.shadowColor = "#7df9ff";
+
+  drawStar(
+    ctx,
+    0,
+    0,
+    size,
+    size * 0.45,
+    this.points,
+    0
+  );
+
+  ctx.fill();
+
+  ctx.restore();
 }
-
 
 // create stars
 const stars = [];
