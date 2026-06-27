@@ -4,13 +4,28 @@ padding:0;
 box-sizing:border-box;
 }
 
-body{
-background:#020511;
-overflow:hidden;
-font-family:'Inter',sans-serif;
-height:100vh;
-position:relative;
-color:white;
+body {
+  margin: 0;
+  overflow: hidden;
+  background:
+   radial-gradient(
+    circle at top,
+    rgba(120, 90, 180, 0.15) 0%,
+    rgba(40, 50, 90, 0.12) 25%,
+    transparent 50%
+  ),
+  linear-gradient(
+    to bottom,
+    #09111f 0%,
+    #040814 50%,
+    #000000 100%
+  );
+    linear-gradient(
+      to bottom,
+      #071021 0%,
+      #030712 45%,
+      #000000 100%
+    );
 }
 
 #starCanvas{
