@@ -244,7 +244,7 @@ hands.onResults((results) => {
       handCtx.arc(
         point.x * handCanvas.width,
         point.y * handCanvas.height,
-        3,
+        2,
         0,
         Math.PI * 2
       );
