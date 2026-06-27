@@ -136,6 +136,7 @@ for (let i = 0; i < STAR_COUNT; i++) {
 
 function animate() {
 
+  // background langit
   const sky = ctx.createLinearGradient(
     0,
     0,
@@ -148,25 +149,26 @@ function animate() {
   sky.addColorStop(1, "#000000");
 
   ctx.fillStyle = sky;
-  ctx.fillRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // glow halus di atas
-  ctx.fillStyle = "rgba(120, 90, 180, 0.12)";
-  ctx.beginPath();
-  ctx.arc(
+  // glow ungu-biru di bagian atas
+  const glow = ctx.createRadialGradient(
     canvas.width / 2,
     0,
-    canvas.width * 0.5,
     0,
-    Math.PI * 2
+    canvas.width / 2,
+    0,
+    canvas.width * 0.6
   );
-  ctx.fill();
 
+  glow.addColorStop(0, "rgba(120, 90, 180, 0.18)");
+  glow.addColorStop(0.3, "rgba(70, 90, 180, 0.10)");
+  glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // bintang
   stars.forEach(star => {
     star.update();
     star.draw();
