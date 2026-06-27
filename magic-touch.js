@@ -203,7 +203,6 @@ function resizeHandCanvas() {
 video.addEventListener("loadedmetadata", resizeHandCanvas);
 window.addEventListener("resize", resizeHandCanvas);
 
-
 const hands = new Hands({
   locateFile: (file) => {
     return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
@@ -217,9 +216,7 @@ hands.setOptions({
   minTrackingConfidence: 0.7
 });
 
-
 hands.onResults((results) => {
-
   handCtx.clearRect(
     0,
     0,
@@ -231,38 +228,33 @@ hands.onResults((results) => {
 
   for (const landmarks of results.multiHandLandmarks) {
 
-drawConnectors(
-  handCtx,
-  landmarks,
-  HAND_CONNECTIONS,
-  {
-    color: "rgba(255,182,217,0.7)",
-    lineWidth: 1
-  }
-);
-
-drawLandmarks(
-  handCtx,
-  landmarks,
-  {
-    color: "#ffffff",
-    fillColor: "#ffb6d9",
-    radius: () => 0.5
-  }
-);
-
-    drawLandmarks(
+    // Garis antar titik
+    drawConnectors(
       handCtx,
       landmarks,
+      HAND_CONNECTIONS,
       {
-        color: "#ffffff",
-        fillColor: "#ffb6d9",
-        radius: 5
+        color: "rgba(255,182,217,0.55)",
+        lineWidth: 1
       }
     );
+
+    // Titik kecil tanpa outline putih
+    for (const point of landmarks) {
+      handCtx.beginPath();
+      handCtx.arc(
+        point.x * handCanvas.width,
+        point.y * handCanvas.height,
+        1.5,
+        0,
+        Math.PI * 2
+      );
+
+      handCtx.fillStyle = "#ffb6d9";
+      handCtx.fill();
+    }
   }
 });
-
 
 const camera = new Camera(video, {
   onFrame: async () => {
