@@ -231,13 +231,13 @@ hands.onResults((results) => {
 
   for (const landmarks of results.multiHandLandmarks) {
 
- drawConnectors(
+drawConnectors(
   handCtx,
   landmarks,
   HAND_CONNECTIONS,
   {
-    color: "#ffb6d9",
-    lineWidth: 2
+    color: "rgba(255,182,217,0.8)",
+    lineWidth: 1.5
   }
 );
 
@@ -247,7 +247,7 @@ drawLandmarks(
   {
     color: "#ffffff",
     fillColor: "#ffb6d9",
-    radius: 3
+    radius: 2
   }
 );
 
