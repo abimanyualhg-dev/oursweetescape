@@ -217,6 +217,7 @@ hands.setOptions({
 });
 
 hands.onResults((results) => {
+
   handCtx.clearRect(
     0,
     0,
@@ -228,7 +229,6 @@ hands.onResults((results) => {
 
   for (const landmarks of results.multiHandLandmarks) {
 
-    // Garis antar titik
     drawConnectors(
       handCtx,
       landmarks,
@@ -239,7 +239,6 @@ hands.onResults((results) => {
       }
     );
 
-    // Titik kecil tanpa outline putih
     for (const point of landmarks) {
       handCtx.beginPath();
       handCtx.arc(
