@@ -23,6 +23,12 @@ startCamera();
 const canvas = document.getElementById("starCanvas");
 const ctx = canvas.getContext("2d");
 
+// ======================
+// PARTICLE MODES
+// ======================
+
+let particleMode = "idle";
+
 function resize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -53,117 +59,168 @@ function drawStar(ctx, x, y, outerRadius, innerRadius, points, rotation) {
 }
 
 class Star {
+
   constructor() {
     this.reset();
   }
 
   reset() {
-  this.x = Math.random() * canvas.width;
-  this.y = Math.random() * canvas.height;
 
-  this.depth = 0.5 + Math.random();
+    this.homeX = Math.random() * canvas.width;
+    this.homeY = Math.random() * canvas.height;
 
-  this.vx = (Math.random() - 0.5) * 0.15 * this.depth;
-  this.vy = (Math.random() - 0.5) * 0.15 * this.depth;
+    this.x = this.homeX;
+    this.y = this.homeY;
 
-  this.radius = 1 + Math.random() * 4;
+    this.targetX = this.homeX;
+    this.targetY = this.homeY;
 
-  this.opacity = 0.35 + Math.random() * 0.65;
+    this.radius = 1 + Math.random() * 4;
 
-  this.seed = Math.random() * 1000;
+    this.depth = 0.5 + Math.random();
 
-  this.rotation = Math.random() * Math.PI * 2;
-  this.rotationSpeed = (Math.random() - 0.5) * 0.015;
+    this.opacity = 0.35 + Math.random() * 0.65;
 
-  this.points = Math.random() > 0.5 ? 4 : 5;
+    this.seed = Math.random() * 9999;
 
-  this.floatOffset = Math.random() * 1000;
-}
+    this.rotation = Math.random() * Math.PI * 2;
+
+    this.rotationSpeed =
+      (Math.random() - 0.5) * 0.015;
+
+    this.points =
+      Math.random() > 0.5 ? 4 : 5;
+
+    this.floatOffset =
+      Math.random() * 1000;
+  }
+
+  setTarget(x, y) {
+
+    this.targetX = x;
+    this.targetY = y;
+
+  }
 
   update(t) {
-    const time = t * 0.001;
-
-    // slow organic drift
-    this.vx += Math.sin(time + this.seed) * 0.002;
-    this.vy += Math.cos(time + this.seed) * 0.002;
-
-    this.vx *= 0.97;
-    this.vy *= 0.97;
-
-    this.x += this.vx;
-    this.y += this.vy;
 
     this.floatOffset += 0.03;
 
-this.x += Math.sin(this.floatOffset) * 0.08;
-this.y += Math.cos(this.floatOffset) * 0.08;
+    const floatX =
+      Math.sin(this.floatOffset) * 0.4;
 
-this.rotation += this.rotationSpeed;
+    const floatY =
+      Math.cos(this.floatOffset) * 0.4;
 
-    // wrap
-    if (this.x < 0) this.x = canvas.width;
-    if (this.x > canvas.width) this.x = 0;
-    if (this.y < 0) this.y = canvas.height;
-    if (this.y > canvas.height) this.y = 0;
+    this.x +=
+      ((this.targetX + floatX) - this.x) * 0.08;
+
+    this.y +=
+      ((this.targetY + floatY) - this.y) * 0.08;
+
+    this.rotation += this.rotationSpeed;
+
   }
 
   draw(t) {
 
-  const twinkle =
-    0.6 +
-    0.4 * Math.sin(t * 0.003 + this.seed);
+    const twinkle =
+      0.6 +
+      0.4 * Math.sin(t * 0.003 + this.seed);
 
-  const size =
-    this.radius * this.depth;
+    const size =
+      this.radius * this.depth;
 
-  ctx.save();
+    ctx.save();
 
-  ctx.translate(this.x, this.y);
-  ctx.rotate(this.rotation);
+    ctx.translate(this.x, this.y);
 
-  ctx.globalAlpha =
-    this.opacity * twinkle;
+    ctx.rotate(this.rotation);
 
-  const gradient = ctx.createRadialGradient(
-    0,
-    0,
-    0,
-    0,
-    0,
-    size * 4
-  );
+    ctx.globalAlpha =
+      this.opacity * twinkle;
 
-  gradient.addColorStop(0, "#ffffff");
-  gradient.addColorStop(0.25, "#d8ffff");
-  gradient.addColorStop(0.6, "#82f7ff");
-  gradient.addColorStop(1, "rgba(130,247,255,0)");
+    const gradient =
+      ctx.createRadialGradient(
+        0,
+        0,
+        0,
+        0,
+        0,
+        size * 4
+      );
 
-  ctx.fillStyle = gradient;
+    gradient.addColorStop(0, "#ffffff");
+    gradient.addColorStop(0.25, "#d8ffff");
+    gradient.addColorStop(0.6, "#82f7ff");
+    gradient.addColorStop(1, "rgba(130,247,255,0)");
 
-  ctx.shadowBlur = 20 * this.depth;
-  ctx.shadowColor = "#7df9ff";
+    ctx.fillStyle = gradient;
 
-  drawStar(
-    ctx,
-    0,
-    0,
-    size,
-    size * 0.45,
-    this.points,
-    0
-  );
+    ctx.shadowBlur = 20 * this.depth;
+    ctx.shadowColor = "#7df9ff";
 
-  ctx.fill();
+    drawStar(
+      ctx,
+      0,
+      0,
+      size,
+      size * 0.45,
+      this.points,
+      0
+    );
 
-  ctx.restore();
+    ctx.fill();
+
+    ctx.restore();
+
+  }
+
 }
-
 // create stars
 const stars = [];
+function setIdleMode() {
+
+  for (const s of stars) {
+
+    s.setTarget(
+      s.homeX,
+      s.homeY
+    );
+
+  }
+
+}
+
+function setClusterMode() {
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+
+  for (const s of stars) {
+
+    const angle =
+      Math.random() * Math.PI * 2;
+
+    const radius =
+      Math.random() * 35;
+
+    s.setTarget(
+
+      cx + Math.cos(angle) * radius,
+
+      cy + Math.sin(angle) * radius
+
+    );
+
+  }
+
+}
 for (let i = 0; i < 400; i++) {
   stars.push(new Star());
 }
 
+setIdleMode();
 
 // ======================
 // LOOP
@@ -226,6 +283,53 @@ hands.onResults((results) => {
 
   if (!results.multiHandLandmarks) return;
 
+const lm = results.multiHandLandmarks[0];
+
+const fingers = [
+
+  lm[8].y < lm[6].y,
+
+  lm[12].y < lm[10].y,
+
+  lm[16].y < lm[14].y,
+
+  lm[20].y < lm[18].y
+
+];
+
+const thumbOpen =
+Math.abs(lm[4].x - lm[3].x) > 0.05;
+
+let openCount =
+fingers.filter(Boolean).length;
+
+if (thumbOpen)
+openCount++;
+
+  if (openCount >= 4) {
+
+  if (particleMode !== "idle") {
+
+    particleMode = "idle";
+
+    setIdleMode();
+
+  }
+
+}
+
+else if (openCount === 0) {
+
+  if (particleMode !== "cluster") {
+
+    particleMode = "cluster";
+
+    setClusterMode();
+
+  }
+
+}
+  
   for (const lm of results.multiHandLandmarks) {
     drawConnectors(handCtx, lm, HAND_CONNECTIONS, {
       color: "rgba(255,182,217,0.6)",
