@@ -136,14 +136,36 @@ for (let i = 0; i < STAR_COUNT; i++) {
 
 function animate() {
 
-  // trailing effect tipis
-  ctx.fillStyle = "rgba(1, 2, 4, 0.25)";
+  const sky = ctx.createLinearGradient(
+    0,
+    0,
+    0,
+    canvas.height
+  );
+
+  sky.addColorStop(0, "#09111f");
+  sky.addColorStop(0.5, "#040814");
+  sky.addColorStop(1, "#000000");
+
+  ctx.fillStyle = sky;
   ctx.fillRect(
     0,
     0,
     canvas.width,
     canvas.height
   );
+
+  // glow halus di atas
+  ctx.fillStyle = "rgba(120, 90, 180, 0.12)";
+  ctx.beginPath();
+  ctx.arc(
+    canvas.width / 2,
+    0,
+    canvas.width * 0.5,
+    0,
+    Math.PI * 2
+  );
+  ctx.fill();
 
   stars.forEach(star => {
     star.update();
