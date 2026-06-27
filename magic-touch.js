@@ -136,7 +136,7 @@ for (let i = 0; i < STAR_COUNT; i++) {
 
 function animate() {
 
-  // background langit
+  // Langit malam
   const sky = ctx.createLinearGradient(
     0,
     0,
@@ -144,31 +144,40 @@ function animate() {
     canvas.height
   );
 
-  sky.addColorStop(0, "#09111f");
-  sky.addColorStop(0.5, "#040814");
+  sky.addColorStop(0, "#071021");
+  sky.addColorStop(0.45, "#030712");
   sky.addColorStop(1, "#000000");
 
   ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // glow ungu-biru di bagian atas
-  const glow = ctx.createRadialGradient(
-    canvas.width / 2,
+  ctx.fillRect(
     0,
     0,
-    canvas.width / 2,
-    0,
-    canvas.width * 0.6
+    canvas.width,
+    canvas.height
   );
 
-  glow.addColorStop(0, "rgba(120, 90, 180, 0.18)");
-  glow.addColorStop(0.3, "rgba(70, 90, 180, 0.10)");
-  glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+  // Glow tipis di atas tengah
+  const glow = ctx.createRadialGradient(
+    canvas.width / 2,
+    canvas.height * 0.15,
+    0,
+    canvas.width / 2,
+    canvas.height * 0.15,
+    canvas.width * 0.35
+  );
+
+  glow.addColorStop(0, "rgba(80,110,180,0.12)");
+  glow.addColorStop(1, "rgba(80,110,180,0)");
 
   ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
 
-  // bintang
+  // gambar bintang
   stars.forEach(star => {
     star.update();
     star.draw();
