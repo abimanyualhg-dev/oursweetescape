@@ -236,8 +236,8 @@ drawConnectors(
   landmarks,
   HAND_CONNECTIONS,
   {
-    color: "rgba(255,182,217,0.8)",
-    lineWidth: 1.5
+    color: "rgba(255,182,217,0.7)",
+    lineWidth: 1
   }
 );
 
@@ -247,7 +247,7 @@ drawLandmarks(
   {
     color: "#ffffff",
     fillColor: "#ffb6d9",
-    radius: 2
+    radius: () => 1
   }
 );
 
