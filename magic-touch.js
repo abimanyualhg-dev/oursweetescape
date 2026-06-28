@@ -279,6 +279,7 @@ hands.setOptions({
 });
 
 hands.onResults((results) => {
+  console.log(results.multiHandLandmarks);
   handCtx.clearRect(0, 0, handCanvas.width, handCanvas.height);
 
   if (!results.multiHandLandmarks) return;
