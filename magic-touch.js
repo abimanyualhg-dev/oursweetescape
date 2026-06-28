@@ -439,7 +439,7 @@ function setHeartMode() {
 
 }
 
-for (let i = 0; i < 400; i++) {
+for (let i = 0; i < 600; i++) {
     stars.push(new Star());
 }
 
