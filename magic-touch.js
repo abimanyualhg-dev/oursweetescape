@@ -280,65 +280,37 @@ hands.setOptions({
 });
 
 hands.onResults((results) => {
-  console.log(results.multiHandLandmarks);
+
+  // ======================
+  // CLEAR
+  // ======================
+
   handCtx.clearRect(0, 0, handCanvas.width, handCanvas.height);
 
-  if (!results.multiHandLandmarks) return;
+  // ======================
+  // CEK ADA TANGAN
+  // ======================
 
-const lm = results.multiHandLandmarks[0];
-
-const fingers = [
-
-  lm[8].y < lm[6].y,
-
-  lm[12].y < lm[10].y,
-
-  lm[16].y < lm[14].y,
-
-  lm[20].y < lm[18].y
-
-];
-
-const thumbOpen =
-Math.abs(lm[4].x - lm[3].x) > 0.05;
-
-let openCount =
-fingers.filter(Boolean).length;
-
-if (thumbOpen)
-openCount++;
-
-  if (openCount >= 4) {
-
-  if (particleMode !== "idle") {
-
-    particleMode = "idle";
-
-    setIdleMode();
-
+  if (
+    !results.multiHandLandmarks ||
+    results.multiHandLandmarks.length === 0
+  ) {
+    return;
   }
 
-}
+  // ======================
+  // GAMBAR SEMUA TANGAN
+  // ======================
 
-else if (openCount === 0) {
-
-  if (particleMode !== "cluster") {
-
-    particleMode = "cluster";
-
-    setClusterMode();
-
-  }
-
-}
-  
   for (const lm of results.multiHandLandmarks) {
+
     drawConnectors(handCtx, lm, HAND_CONNECTIONS, {
       color: "rgba(255,182,217,0.6)",
       lineWidth: 1
     });
 
     for (const p of lm) {
+
       handCtx.beginPath();
       handCtx.arc(
         p.x * handCanvas.width,
@@ -350,8 +322,18 @@ else if (openCount === 0) {
 
       handCtx.fillStyle = "#ffb6d9";
       handCtx.fill();
+
     }
   }
+
+  // ======================
+  // GESTURE DETECTION
+  // ======================
+
+  const lm = results.multiHandLandmarks[0];
+
+  // nanti gesture di sini
+
 });
 
 const camera = new Camera(video, {
