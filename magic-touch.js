@@ -259,6 +259,7 @@ const handCanvas = document.getElementById("handCanvas");
 const handCtx = handCanvas.getContext("2d");
 
 function resizeHand() {
+  console.log(handCanvas.width, handCanvas.height);
   handCanvas.width = video.clientWidth;
   handCanvas.height = video.clientHeight;
 }
