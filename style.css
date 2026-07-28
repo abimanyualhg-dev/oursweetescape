@@ -150,7 +150,8 @@ border-radius:28px;
 
 #generateBtn,
 #loginBtn,
-#magicTouchBtn{
+#magicTouchBtn,
+#magicGardenBtn{
 padding:18px 42px;
 border:none;
 border-radius:999px;
@@ -164,8 +165,13 @@ transition:.35s;
 
 #generateBtn:hover,
 #loginBtn:hover,
-#magicTouchBtn:hover{
+#magicTouchBtn:hover,
+#magicGardenBtn:hover{
 transform:scale(1.06);
+}
+
+#magicGardenBtn{
+    margin-top:20px;
 }
 
 #loginBtn{
