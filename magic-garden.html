@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Garden | Our Sweet Escape</title>
+
+    <link rel="stylesheet" href="magic-garden.css">
+    <script type="module" src="magic-garden.js"></script>
+</head>
+<body>
+    <video
+        id="camera"
+        autoplay
+        playsinline
+        muted
+    ></video>
+    <div id="scene">
+
+        <!-- Background -->
+        <img id="background"
+            src="assets/background.png"
+            alt="Background">
+
+        <!-- Canvas Stars -->
+        <canvas id="starCanvas"></canvas>
+
+        <!-- Glow Lamp -->
+        <img class="lamp-glow" id="glow1" src="assets/glow1.png">
+        <img class="lamp-glow" id="glow2" src="assets/glow2.png">
+        <img class="lamp-glow" id="glow3" src="assets/glow3.png">
+        <img class="lamp-glow" id="glow4" src="assets/glow4.png">
+
+        <!-- Lamp Posts -->
+        <img id="lamp-posts"
+            src="assets/lamp-posts.png">
+
+        <!-- Foreground Trees -->
+        <img id="foreground-trees"
+            src="assets/foreground-trees.png">
+
+        <!-- Canvas Magic -->
+        <canvas id="magicCanvas"></canvas>
+
+        <!-- Wand -->
+        <img id="wand"
+            src="assets/wand.png">
+
+    </div>
+
+    <script type="module" src="magic-garden.js"></script>
+
+</body>
+</html>
