@@ -118,6 +118,11 @@ window.location.href = "magic-touch.html";
 
 /* MAGIC GARDEN */
 
-document.getElementById("magicGardenBtn").addEventListener("click", () => {
-    window.location.href = "magic-garden.html";
+const magicGardenBtn =
+document.getElementById("magicGardenBtn");
+
+magicGardenBtn.addEventListener("click",()=>{
+
+window.location.href = "magic-garden.html";
+
 });
