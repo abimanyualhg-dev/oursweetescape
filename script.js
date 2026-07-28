@@ -115,3 +115,9 @@ magicTouchBtn.addEventListener("click",()=>{
 window.location.href = "magic-touch.html";
 
 });
+
+/* MAGIC GARDEN */
+
+document.getElementById("magicGardenBtn").addEventListener("click", () => {
+    window.location.href = "magic-garden.html";
+});
