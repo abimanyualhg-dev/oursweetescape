@@ -29,6 +29,9 @@ month:"long",
 day:"numeric",
 year:"numeric"
 });
+
+updateSpecialDay();
+  
 }
 
 setInterval(updateTimer,1000);
@@ -126,3 +129,61 @@ magicGardenBtn.addEventListener("click",()=>{
 window.location.href = "magic-garden.html";
 
 });
+
+function getOrdinal(n){
+
+    if(n % 100 >= 11 && n % 100 <= 13)
+        return n + "th";
+
+    switch(n % 10){
+
+        case 1: return n + "st";
+        case 2: return n + "nd";
+        case 3: return n + "rd";
+        default: return n + "th";
+
+    }
+
+}
+
+function updateSpecialDay(){
+
+    const box = document.getElementById("specialDay");
+
+    const today = new Date();
+
+    if(today.getDate() !== 28){
+
+        box.textContent = "";
+        return;
+
+    }
+
+    const start = new Date(2025,11,28);
+
+    let months =
+        (today.getFullYear()-start.getFullYear())*12 +
+        (today.getMonth()-start.getMonth());
+
+    if(months <= 0){
+
+        box.textContent = "";
+        return;
+
+    }
+
+    if(today.getMonth() === 11){
+
+        const years = today.getFullYear()-2025;
+
+        box.textContent =
+        `✨ ${getOrdinal(years)} ANNIVERSARY ✨`;
+
+    }else{
+
+        box.textContent =
+        `🌸 ${getOrdinal(months)} MONTHVERSARY 🌸`;
+
+    }
+
+}
