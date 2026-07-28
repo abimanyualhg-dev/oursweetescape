@@ -392,3 +392,14 @@ max-width:300px;
 }
 
 }
+
+#specialDay{
+margin-top:24px;
+font-family:'Playfair Display',serif;
+font-size:1.2rem;
+font-weight:700;
+color:#FF8FC7;
+text-shadow:0 0 18px rgba(255,143,199,.8);
+min-height:32px;
+letter-spacing:1px;
+}
