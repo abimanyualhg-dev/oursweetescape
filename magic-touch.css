@@ -7,7 +7,12 @@
 body {
   overflow: hidden;
   min-height: 100vh;
-  background: #050814;
+
+  background-image: url("../background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 /* STAR CANVAS */
