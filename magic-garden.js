@@ -143,9 +143,12 @@ function animateStars(){
 
 animateStars();
 
-function turnOffAllLights() {
-    glows.forEach(glow => {
-        glow.style.opacity = "0";
+function turnOffAllLights(){
+    glows.forEach(glow=>{
+        glow.style.opacity="0";
+    });
+    lamps.forEach(lamp=>{
+        lamp.lit = false;
     });
 }
 
@@ -305,6 +308,7 @@ async function initBlowDetector() {
             }
             
             volume /= data.length;
+            console.log(volume);
 
             if (!blowCooldown) {
 
@@ -366,8 +370,12 @@ async function initHandTracking(){
 
                 runningMode:"VIDEO",
 
-                numHands:1
+                numHands:1,
 
+                minHandDetectionConfidence: 0.6,
+                minHandPresenceConfidence: 0.6,
+                minTrackingConfidence: 0.6,
+                
             }
         );
 
