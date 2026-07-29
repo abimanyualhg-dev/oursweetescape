@@ -110,8 +110,6 @@ lines.forEach((line, i) => {
 
 });
 
-console.log(textCtx.measureText("HELLO"));
-
   const image =
     textCtx.getImageData(
       0,
@@ -152,9 +150,6 @@ if (
     }
 
   }
-
-console.log(points.length);
-console.log(points.slice(0, 10));
   
   textCache.set(text, points);
 
@@ -168,11 +163,11 @@ console.log(points.slice(0, 10));
 
 let particleMode = "idle";
 
-
 function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
+
 resize();
 window.addEventListener("resize", resize);
 
@@ -253,10 +248,10 @@ class Star {
       Math.cos(this.floatOffset) * 0.4;
 
     this.x +=
-      ((this.targetX + floatX) - this.x) * 0.08;
+      ((this.targetX + floatX) - this.x) * 0.25;
 
     this.y +=
-      ((this.targetY + floatY) - this.y) * 0.08;
+      ((this.targetY + floatY) - this.y) * 0.25;
 
     this.rotation += this.rotationSpeed;
 
@@ -297,8 +292,7 @@ class Star {
 
     ctx.fillStyle = gradient;
 
-    ctx.shadowBlur = 20 * this.depth;
-    ctx.shadowColor = "#7df9ff";
+    ctx.shadowBlur = 0 * this.depth;
 
     drawStar(
       ctx,
@@ -429,16 +423,16 @@ function setHeartMode() {
 
         stars[i].setTarget(
 
-            points[i].x + (Math.random() - 0.5) * 2,
+            points[i].x + (Math.random() - 0.5) * 15,
 
-            points[i].y + (Math.random() - 0.5) * 2
+            points[i].y + (Math.random() - 0.5) * 15
 
         );
 
     }
 
 }
-
+// JUMLAH BINTANG //
 for (let i = 0; i < 1200; i++) {
     stars.push(new Star());
 }
@@ -451,17 +445,12 @@ setIdleMode();
 
 function animate(t) {
 
-  // background
-  const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  sky.addColorStop(0, "#071021");
-  sky.addColorStop(1, "#000000");
-
-  ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // IMPORTANT: safe fade (NOT destroy visibility)
-  ctx.fillStyle = "rgba(0,0,0,0.03)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+  );
 
   for (let star of stars) {
     star.update(t);
@@ -525,7 +514,6 @@ const handCanvas = document.getElementById("handCanvas");
 const handCtx = handCanvas.getContext("2d");
 
 function resizeHand() {
-  console.log(handCanvas.width, handCanvas.height);
   handCanvas.width = video.clientWidth;
   handCanvas.height = video.clientHeight;
 }
@@ -539,10 +527,10 @@ const hands = new Hands({
 });
 
 hands.setOptions({
-  maxNumHands: 2,
-  modelComplexity: 1,
-  minDetectionConfidence: 0.7,
-  minTrackingConfidence: 0.7
+    maxNumHands:1,
+    modelComplexity:0,
+    minDetectionConfidence:0.5,
+    minTrackingConfidence:0.5
 });
 
 hands.onResults((results) => {
