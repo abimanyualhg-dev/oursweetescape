@@ -81,7 +81,13 @@ h1 {
 }
 
 p {
-  margin-top: 8px;
+  margin-top: 10px;
   font-family: "Cormorant Garamond", serif;
-  color: rgba(255,255,255,0.75);
+
+  font-size: 1.15rem;
+  line-height: 1.6;
+
+  color: rgba(255,255,255,0.82);
+
+  letter-spacing: 0.5px;
 }
